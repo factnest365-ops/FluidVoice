@@ -99,6 +99,8 @@ final class VoiceEngineSettingsViewModel: ObservableObject {
             models = models.filter { $0.provider == .openai }
         case .qwen:
             models = models.filter { $0.provider == .qwen }
+        case .cactus:
+            models = models.filter { $0.provider == .cactus }
         }
 
         if self.englishOnlyFilter {
@@ -226,6 +228,8 @@ final class VoiceEngineSettingsViewModel: ObservableObject {
             return "Nemotron 3.5 Multilingual is slower but more accurate. Supports around 40 languages with auto or manual language selection. Best on Apple Silicon with 8GB+ RAM."
         case .nemotronStreaming, .nemotronStreaming320:
             return "Nemotron Speech 3.5 Streaming Capable uses NVIDIA's streaming CoreML pipeline. Supports around 40 languages with auto or manual language selection."
+        case .whistle:
+            return "Whistle is a 16.9 MB speech-to-text engine from Cactus Compute. English, German, French, Spanish, Italian, Dutch and Polish with automatic language detection, on CPU."
         default:
             return "Whisper models support 99 languages and work on any Mac."
         }

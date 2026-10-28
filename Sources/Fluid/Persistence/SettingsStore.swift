@@ -5214,6 +5214,10 @@ final class SettingsStore: ObservableObject {
 
         case qwen3Asr17B = "qwen3-asr-1.7b"
 
+        // MARK: - Cactus Whistle
+
+        case whistle = "whistle"
+
         var parakeetDescriptor: ParakeetSpeechModelCatalog.Descriptor? {
             ParakeetSpeechModelCatalog.descriptor(forModelID: self.rawValue)
         }
@@ -5248,6 +5252,7 @@ final class SettingsStore: ObservableObject {
             case .whisperLargeTurbo: return "Whisper Large Turbo"
             case .whisperLarge: return "Whisper Large"
             case .qwen3Asr17B: return "Qwen3 ASR 1.7B"
+            case .whistle: return "Whistle (Cactus)"
             }
         }
 
@@ -5262,6 +5267,7 @@ final class SettingsStore: ObservableObject {
             case .appleSpeechAnalyzer: return "EN, ES, FR, DE, IT, JA, KO, PT, ZH"
             case .whisperTiny, .whisperBase, .whisperSmall, .whisperMedium, .whisperLargeTurbo, .whisperLarge:
                 return "99 Languages"
+            case .whistle: return "7 Languages (Auto-detected)"
             }
         }
 
@@ -5283,6 +5289,7 @@ final class SettingsStore: ObservableObject {
             case .whisperLargeTurbo: return "~845.3 MiB"
             case .whisperLarge: return "~1.55 GiB"
             case .qwen3Asr17B: return "~2.03 GiB"
+            case .whistle: return "~18 MiB"
             }
         }
 
@@ -5302,12 +5309,13 @@ final class SettingsStore: ObservableObject {
             case .whisperLarge: return 1_668_741_440
             case .qwen3Asr17B: return 2_185_030_624
             case .appleSpeech, .appleSpeechAnalyzer: return 0
+            case .whistle: return 16_919_407 + 1_107_096
             }
         }
 
         var requiresAppleSilicon: Bool {
             switch self {
-            case .parakeetTDT, .parakeetTDTv2, .fluidParakeetMini, .fluidParakeetPico, .fluidParakeetPro, .parakeetRealtime, .qwen3Asr, .qwen3Asr17B, .cohereTranscribeSixBit, .nemotronOffline, .nemotronStreaming, .nemotronStreaming320: return true
+            case .parakeetTDT, .parakeetTDTv2, .fluidParakeetMini, .fluidParakeetPico, .fluidParakeetPro, .parakeetRealtime, .qwen3Asr, .qwen3Asr17B, .cohereTranscribeSixBit, .nemotronOffline, .nemotronStreaming, .nemotronStreaming320, .whistle: return true
             default: return false
             }
         }
@@ -5315,7 +5323,7 @@ final class SettingsStore: ObservableObject {
         var isWhisperModel: Bool {
             switch self {
             case .parakeetTDT, .parakeetTDTv2, .fluidParakeetMini, .fluidParakeetPico, .fluidParakeetPro, .parakeetRealtime, .qwen3Asr, .qwen3Asr17B, .cohereTranscribeSixBit, .nemotronOffline, .nemotronStreaming, .nemotronStreaming320, .appleSpeech,
-                 .appleSpeechAnalyzer: return false
+                 .appleSpeechAnalyzer, .whistle: return false
             default: return true
             }
         }
@@ -5447,6 +5455,7 @@ final class SettingsStore: ObservableObject {
             case .whisperLargeTurbo: return "Higher Quality but Faster"
             case .whisperLarge: return "Maximum Accuracy"
             case .qwen3Asr17B: return "Qwen3 - Multilingual 1.7B"
+            case .whistle: return "Whistle - Tiny & Fast"
             }
         }
 
@@ -5485,6 +5494,8 @@ final class SettingsStore: ObservableObject {
                 return "Best possible accuracy. Large download and memory usage."
             case .qwen3Asr17B:
                 return "Automatically detects 30 languages. Transcribes on your Mac after you stop recording."
+            case .whistle:
+                return "16.9 MB speech-to-text from Cactus Compute. English, German, French, Spanish, Italian, Dutch and Polish with automatic language detection, on CPU."
             }
         }
 
@@ -5515,6 +5526,8 @@ final class SettingsStore: ObservableObject {
                 return 8.0
             case .qwen3Asr17B:
                 return 6.0
+            case .whistle:
+                return 2.0
             }
         }
 
@@ -5552,6 +5565,7 @@ final class SettingsStore: ObservableObject {
             case .whisperLargeTurbo: return 3
             case .whisperLarge: return 1
             case .qwen3Asr17B: return 3
+            case .whistle: return 5
             }
         }
 
@@ -5573,6 +5587,7 @@ final class SettingsStore: ObservableObject {
             case .whisperLargeTurbo: return 5
             case .whisperLarge: return 5
             case .qwen3Asr17B: return 5
+            case .whistle: return 3
             }
         }
 
@@ -5594,6 +5609,7 @@ final class SettingsStore: ObservableObject {
             case .whisperLargeTurbo: return 0.65
             case .whisperLarge: return 0.20
             case .qwen3Asr17B: return 0.50
+            case .whistle: return 1.0
             }
         }
 
@@ -5615,6 +5631,7 @@ final class SettingsStore: ObservableObject {
             case .whisperLargeTurbo: return 0.95
             case .whisperLarge: return 1.00
             case .qwen3Asr17B: return 1.00
+            case .whistle: return 0.65
             }
         }
 
@@ -5705,6 +5722,7 @@ final class SettingsStore: ObservableObject {
             case openai = "OpenAI"
             case qwen = "Qwen"
             case cohere = "Cohere"
+            case cactus = "Cactus"
         }
 
         /// Which provider this model belongs to
@@ -5720,6 +5738,8 @@ final class SettingsStore: ObservableObject {
                 return .cohere
             case .whisperTiny, .whisperBase, .whisperSmall, .whisperMedium, .whisperLargeTurbo, .whisperLarge:
                 return .openai
+            case .whistle:
+                return .cactus
             }
         }
 
@@ -5778,6 +5798,23 @@ final class SettingsStore: ObservableObject {
                 #else
                 return false
                 #endif
+            case .whistle:
+                let directory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?
+                    .appendingPathComponent("WhistleEngine")
+                guard let directory else { return false }
+                let engine = directory.appendingPathComponent("needle")
+                let model = directory.appendingPathComponent("whistle.cact")
+                guard
+                    let engineAttributes = try? FileManager.default.attributesOfItem(atPath: engine.path),
+                    let engineSize = engineAttributes[.size] as? NSNumber,
+                    engineSize.int64Value > 0,
+                    let modelAttributes = try? FileManager.default.attributesOfItem(atPath: model.path),
+                    let modelSize = modelAttributes[.size] as? NSNumber,
+                    modelSize.int64Value == self.expectedDownloadBytes
+                else {
+                    return false
+                }
+                return true
             default:
                 // Whisper models
                 guard let whisperFile = self.whisperModelFile else { return false }
@@ -5834,6 +5871,8 @@ final class SettingsStore: ObservableObject {
                 return "Apple"
             case .whisperTiny, .whisperBase, .whisperSmall, .whisperMedium, .whisperLargeTurbo, .whisperLarge:
                 return "OpenAI"
+            case .whistle:
+                return "Cactus"
             }
         }
 
@@ -5860,6 +5899,8 @@ final class SettingsStore: ObservableObject {
                 return "#A2AAAD" // Apple Gray
             case .whisperTiny, .whisperBase, .whisperSmall, .whisperMedium, .whisperLargeTurbo, .whisperLarge:
                 return "#10A37F" // OpenAI Teal
+            case .whistle:
+                return "#7C5CFF" // Cactus Violet
             }
         }
     }

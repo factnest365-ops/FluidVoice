@@ -21,6 +21,7 @@ final class SpeechModelInstallationSnapshot: ObservableObject {
             case cohere(ExternalCoreMLASRModelSpec, storedPath: String?)
             case nemotron(folder: String)
             case whisper(file: String, expectedBytes: Int64)
+            case whistle
             case unavailable
         }
 
@@ -179,6 +180,8 @@ final class SpeechModelInstallationSnapshot: ObservableObject {
                     kind = .nemotron(folder: "nemotron-3.5-asr-offline-6bit-CoreML")
                 case .nemotronStreaming, .nemotronStreaming320:
                     kind = .nemotron(folder: "nemotron-3.5-asr-streaming320-int8-CoreML")
+                case .whistle:
+                    kind = .whistle
                 default:
                     kind = .unavailable
                 }
@@ -248,6 +251,14 @@ final class SpeechModelInstallationSnapshot: ObservableObject {
                 let url = caches?.appendingPathComponent("WhisperModels", isDirectory: true).appendingPathComponent(file)
                 let attributes = url.flatMap { try? fm.attributesOfItem(atPath: $0.path) }
                 exists = expectedBytes > 0 && (attributes?[.size] as? NSNumber)?.int64Value == expectedBytes
+            case .whistle:
+                let directory = caches?.appendingPathComponent("WhistleEngine", isDirectory: true)
+                let engine = directory?.appendingPathComponent("needle")
+                let model = directory?.appendingPathComponent("whistle.cact")
+                let engineAttributes = engine.flatMap { try? fm.attributesOfItem(atPath: $0.path) }
+                let modelAttributes = model.flatMap { try? fm.attributesOfItem(atPath: $0.path) }
+                exists = (engineAttributes?[.size] as? NSNumber)?.int64Value == WhistleProvider.expectedEngineBytes
+                    && (modelAttributes?[.size] as? NSNumber)?.int64Value == WhistleProvider.expectedModelBytes
             case .unavailable:
                 exists = false
             }

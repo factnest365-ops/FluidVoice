@@ -1077,6 +1077,7 @@ final class ASRService: ObservableObject {
     private var externalCoreMLProvider: ExternalCoreMLTranscriptionProvider?
     private var nemotronProviders: [NemotronProvider.Mode: NemotronProvider] = [:]
     private var whisperProvider: WhisperProvider?
+    private var whistleProvider: WhistleProvider?
     private var appleSpeechProvider: AppleSpeechProvider?
     /// Stored as Any? because @available cannot be applied to stored properties
     private var _appleSpeechAnalyzerProvider: Any?
@@ -1221,6 +1222,8 @@ final class ASRService: ObservableObject {
             return self.getNemotronProvider(mode: model.nemotronProviderMode)
         case .qwen3Asr:
             return self.getFluidAudioProvider()
+        case .whistle:
+            return self.getWhistleProvider()
         default:
             return self.getWhisperProvider()
         }
@@ -1276,6 +1279,16 @@ final class ASRService: ObservableObject {
         let provider = WhisperProvider()
         self.whisperProvider = provider
         DebugLogger.shared.info("ASRService: Created Whisper provider", source: "ASRService")
+        return provider
+    }
+
+    private func getWhistleProvider() -> WhistleProvider {
+        if let existing = whistleProvider {
+            return existing
+        }
+        let provider = WhistleProvider()
+        self.whistleProvider = provider
+        DebugLogger.shared.info("ASRService: Created Whistle provider", source: "ASRService")
         return provider
     }
 
@@ -1355,6 +1368,8 @@ final class ASRService: ObservableObject {
         case .qwen3Asr:
             // Qwen support removed; route legacy requests to Parakeet v3.
             return FluidAudioProvider(modelOverride: .parakeetTDT, configureWordBoosting: false)
+        case .whistle:
+            return WhistleProvider(modelOverride: model)
         default:
             // Whisper models - create provider with specific model override
             return WhisperProvider(modelOverride: model)
@@ -1557,6 +1572,7 @@ final class ASRService: ObservableObject {
         self.parakeetRealtimeProvider = nil
         self.externalCoreMLProvider = nil
         self.whisperProvider = nil
+        self.whistleProvider = nil
         self.appleSpeechProvider = nil
         self._appleSpeechAnalyzerProvider = nil
 
